@@ -125,6 +125,3 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configuration API école (à modifier)
-SCHOOL_API_BASE_URL = 'https://api.telecom-sudparis.eu'  # URL à ajuster
-SCHOOL_API_TOKEN = 'your-api-token-here'  # API token à demander et à ajuster
