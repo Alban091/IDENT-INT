@@ -1,5 +1,5 @@
-<!DOCTYPE html>
 {% load static %}
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -16,61 +16,247 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
+        :root {
+            --primary-green: #00ff88;
+            --dark-bg: #1a1d29;
+            --darker-bg: #14161f;
+            --text-light: #e4e4e7;
+            --text-muted: #a1a1aa;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        /* Navbar moderne */
         .navbar {
-            background: rgba(255, 255, 255, 0.95) !important;
+            background: rgba(20, 22, 31, 0.95) !important;
             backdrop-filter: blur(10px);
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
         }
 
         .navbar-brand {
             font-weight: 700;
-            font-size: 1.5rem;
-            color: #667eea !important;
+            font-size: 1.8rem;
+            color: white !important;
+            letter-spacing: -0.5px;
+        }
+
+        .navbar-brand span {
+            color: var(--primary-green);
         }
 
         .navbar-brand img {
-            height: 40px;
-            margin-right: 10px;
+            height: 45px;
+            margin-right: 12px;
+            filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.3));
         }
 
+        .nav-link {
+            color: var(--text-light) !important;
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 8px 20px !important;
+            margin: 0 5px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-green) !important;
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .nav-link.active {
+            color: var(--primary-green) !important;
+        }
+
+        /* Main content */
         .main-content {
-            min-height: calc(100vh - 76px);
-            display: flex;
-            align-items: center;
-            padding: 40px 0;
+            min-height: 100vh;
+            padding-top: 100px;
         }
 
+        /* Cards modernes */
         .card {
-            border: none;
+            background: var(--darker-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
         }
 
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-green);
+            box-shadow: 0 15px 50px rgba(0, 255, 136, 0.2);
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* Boutons modernes */
         .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: var(--primary-green);
             border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
+            color: var(--dark-bg);
+            padding: 14px 35px;
+            border-radius: 12px;
             font-weight: 600;
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 25px rgba(0, 255, 136, 0.3);
         }
 
         .btn-primary:hover {
+            background: #00e67a;
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 35px rgba(0, 255, 136, 0.5);
+            color: var(--dark-bg);
         }
 
-        .badge:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        .btn-outline-primary {
+            border: 2px solid var(--primary-green);
+            color: var(--primary-green);
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-green);
+            color: var(--dark-bg);
+        }
+
+        /* Titles */
+        h1, h2, h3, h4, h5, h6 {
+            color: white;
+            font-weight: 700;
+        }
+
+        .text-primary {
+            color: var(--primary-green) !important;
+        }
+
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        /* Accents verts */
+        .accent-line {
+            width: 60px;
+            height: 4px;
+            background: var(--primary-green);
+            border-radius: 2px;
+            margin: 1rem 0;
+        }
+
+        /* Glow effects */
+        .glow-green {
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+
+        /* Alerts */
+        .alert {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 12px;
+            color: var(--text-light);
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Badge */
+        .badge {
+            background: rgba(0, 255, 136, 0.15);
+            color: var(--primary-green);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        /* Forms */
+        .form-control, .form-select {
+            background: var(--darker-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            padding: 12px 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: var(--darker-bg);
+            border-color: var(--primary-green);
+            color: var(--text-light);
+            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+        }
+
+        /* Icons */
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid var(--primary-green);
+            border-radius: 50%;
+            font-size: 1.5rem;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+
+        /* Scrollbar personnalisée */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--darker-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-green);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00e67a;
         }
     </style>
 
@@ -78,14 +264,39 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="{% url 'recognition:home' %}">
                 <img src="{% static 'images/logo.png' %}" alt="Logo">
-                TSP IDENTINT
+                TSP <span>IDENTINT</span>
             </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'recognition:home' %}">
+                            <i class="fas fa-home"></i> Accueil
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container" style="margin-top: 100px;">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <!-- Main Content -->
     <div class="main-content">

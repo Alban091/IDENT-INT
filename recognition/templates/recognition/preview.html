@@ -3,40 +3,161 @@
 
 {% block title %}Prévisualisation - TSP IDENTINT{% endblock %}
 
+{% block extra_css %}
+<style>
+    .preview-section {
+        padding: 2rem 0;
+    }
+
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 2rem;
+        background: rgba(0, 255, 136, 0.1);
+        border: 3px solid var(--primary-green);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: var(--primary-green);
+        animation: scaleIn 0.5s ease-out;
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .photo-container {
+        position: relative;
+        border: 3px solid var(--primary-green);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 15px 50px rgba(0, 255, 136, 0.3);
+    }
+
+    .photo-container img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .info-card {
+        background: var(--darker-bg);
+        border: 1px solid rgba(0, 255, 136, 0.2);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-item i {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 255, 136, 0.1);
+        border-radius: 8px;
+        color: var(--primary-green);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-body p-5">
-                <h2 class="text-center mb-4">
-                    <i class="fas fa-check-circle text-success"></i> Photo uploadée avec succès !
-                </h2>
-                
-                <div class="text-center mb-4">
-                    <img src="{{ photo_url }}" alt="Photo uploadée" class="img-fluid rounded" style="max-height: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+<div class="preview-section">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Success Header -->
+            <div class="text-center mb-5">
+                <div class="success-icon">
+                    <i class="fas fa-check"></i>
                 </div>
-                
-                <div class="alert alert-info text-center">
-                    <i class="fas fa-file-image"></i>
-                    <strong>Nom du fichier :</strong> {{ photo_name }}
-                </div>
-                
-                <div class="row g-3 mt-4">
-                    <div class="col-md-6">
-                        <a href="{% url 'recognition:home' %}" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-arrow-left"></i> Retour à l'accueil
-                        </a>
-                    </div>
-                    <div class="col-md-6">
-                        <button class="btn btn-primary w-100" disabled>
-                            <i class="fas fa-brain"></i> Analyser (bientôt disponible)
-                        </button>
+                <h1 class="mb-2">Photo uploadée avec succès !</h1>
+                <p class="text-muted">Votre photo a été traitée et est prête pour l'analyse</p>
+            </div>
+
+            <div class="row">
+                <!-- Photo -->
+                <div class="col-lg-7 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="mb-4">
+                                <i class="fas fa-image text-primary"></i> Photo analysée
+                            </h5>
+                            <div class="photo-container">
+                                <img src="{{ photo_url }}" alt="Photo uploadée">
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="alert alert-warning mt-4">
-                    <i class="fas fa-info-circle"></i>
-                    <strong>Info :</strong> La photo est stockée temporairement et sera supprimée automatiquement. L'analyse de reconnaissance faciale sera ajoutée prochainement.
+
+                <!-- Informations -->
+                <div class="col-lg-5 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="mb-4">
+                                <i class="fas fa-info-circle text-primary"></i> Informations
+                            </h5>
+
+                            <div class="info-card">
+                                <div class="info-item">
+                                    <i class="fas fa-file-image"></i>
+                                    <div class="flex-grow-1">
+                                        <small class="text-muted d-block">Nom du fichier</small>
+                                        <strong>{{ photo_name }}</strong>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-clock"></i>
+                                    <div class="flex-grow-1">
+                                        <small class="text-muted d-block">Uploadé</small>
+                                        <strong>À l'instant</strong>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <div class="flex-grow-1">
+                                        <small class="text-muted d-block">Statut</small>
+                                        <span class="badge">Traité avec succès</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <i class="fas fa-lightbulb"></i>
+                                <strong>Prochaine étape</strong><br>
+                                <small>L'analyse de reconnaissance faciale sera ajoutée prochainement pour identifier automatiquement les étudiants.</small>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <button class="btn btn-primary btn-lg" disabled>
+                                    <i class="fas fa-brain"></i> Analyser (En développement)
+                                </button>
+                                <a href="{% url 'recognition:home' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-arrow-left"></i> Retour à l'accueil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
