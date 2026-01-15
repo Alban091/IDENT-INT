@@ -1,0 +1,45 @@
+{% extends 'recognition/base.html' %}
+{% load static %}
+
+{% block title %}Prévisualisation - TSP IDENTINT{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-4">
+                    <i class="fas fa-check-circle text-success"></i> Photo uploadée avec succès !
+                </h2>
+                
+                <div class="text-center mb-4">
+                    <img src="{{ photo_url }}" alt="Photo uploadée" class="img-fluid rounded" style="max-height: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                </div>
+                
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-file-image"></i>
+                    <strong>Nom du fichier :</strong> {{ photo_name }}
+                </div>
+                
+                <div class="row g-3 mt-4">
+                    <div class="col-md-6">
+                        <a href="{% url 'recognition:home' %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-arrow-left"></i> Retour à l'accueil
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-primary w-100" disabled>
+                            <i class="fas fa-brain"></i> Analyser (bientôt disponible)
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning mt-4">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Info :</strong> La photo est stockée temporairement et sera supprimée automatiquement. L'analyse de reconnaissance faciale sera ajoutée prochainement.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
