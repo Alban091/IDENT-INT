@@ -4,6 +4,7 @@ from . import views
 app_name = 'recognition'
 
 urlpatterns = [
-# Page d'accueil / upload
     path('', views.home, name='home'),
+    path('upload/', views.upload_photo, name='upload_photo'),
+    path('preview/', views.preview, name='preview'),
 ]
