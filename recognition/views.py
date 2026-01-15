@@ -64,3 +64,6 @@ def error_404(request, exception):
 
 def error_500(request):
     return render(request, 'recognition/500.html', status=500)
+
+def about(request):
+    return render(request, 'recognition/about.html')

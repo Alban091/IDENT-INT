@@ -8,84 +8,206 @@
     <link rel="icon" type="image/png" href="/static/images/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #00ff88;
+            --dark-bg: #1a1d29;
+            --darker-bg: #14161f;
+            --text-light: #e4e4e7;
+            --text-muted: #a1a1aa;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-light);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background effects */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.15), transparent);
+            border-radius: 50%;
+            top: -200px;
+            right: -100px;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.1), transparent);
+            border-radius: 50%;
+            bottom: -150px;
+            left: -100px;
+            animation: pulse 4s ease-in-out infinite 2s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.5; }
         }
 
         .error-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            padding: 3rem;
+            background: var(--darker-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            padding: 4rem 3rem;
             max-width: 600px;
             width: 100%;
+            position: relative;
+            z-index: 1;
+            text-align: center;
         }
 
         .error-icon {
-            font-size: 5rem;
-            color: #dc3545;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            background: rgba(239, 68, 68, 0.1);
+            border: 3px solid #ef4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #ef4444;
+            animation: shake 1s ease-in-out;
         }
 
-        .display-1 {
-            font-size: 5rem;
-            font-weight: 700;
-            color: #667eea;
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-block;
+        .error-code {
+            font-size: 8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
             color: white;
+            font-weight: 700;
+            margin-bottom: 1rem;
         }
 
-        .btn-primary:hover {
+        p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .alert {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .alert strong {
+            color: white;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert ul {
+            margin: 0.5rem 0 0 0;
+            padding-left: 1.5rem;
+        }
+
+        .alert li {
+            margin-bottom: 0.25rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 35px;
+            background: var(--primary-green);
+            color: var(--dark-bg);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 25px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn:hover {
+            background: #00e67a;
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 35px rgba(0, 255, 136, 0.5);
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .error-code {
+                font-size: 5rem;
+            }
+
+            .error-card {
+                padding: 2.5rem 2rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="error-card text-center">
-        <div class="mb-4">
-            <i class="fas fa-server error-icon"></i>
+    <div class="error-card">
+        <div class="error-icon">
+            <i class="fas fa-server"></i>
         </div>
 
-        <h1 class="display-1 mb-3">500</h1>
-        <h2 class="mb-3">Erreur serveur</h2>
+        <h1 class="error-code">500</h1>
+        <h2>Erreur serveur</h2>
 
-        <p class="text-muted mb-4">
+        <p>
             Une erreur interne est survenue sur le serveur. Nos équipes ont été notifiées et travaillent à résoudre ce problème.
         </p>
 
-        <div class="alert alert-danger border-0">
+        <div class="alert">
             <i class="fas fa-tools"></i>
             <strong>Que faire ?</strong>
-            <ul class="list-unstyled mt-2 mb-0 text-start">
+            <ul>
                 <li>Réessayez dans quelques instants</li>
                 <li>Retournez à la page d'accueil</li>
                 <li>Contactez l'administrateur si le problème persiste</li>
             </ul>
         </div>
 
-        <div class="mt-4">
-            <a href="/" class="btn btn-primary btn-lg">
-                <i class="fas fa-home"></i> Retour à l'accueil
-            </a>
-        </div>
+        <a href="/" class="btn">
+            <i class="fas fa-home"></i> Retour à l'accueil
+        </a>
     </div>
 </body>
 </html>
