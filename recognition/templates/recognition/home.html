@@ -1,10 +1,261 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
+{% extends 'recognition/base.html' %}
 
-</body>
-</html>
+{% block title %}Accueil - TSP IDENTINT{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <!-- Hero Section -->
+        <div class="text-center mb-5">
+            <h1 class="hero-title">
+                <i class="fas fa-brain"></i> TSP IDENTINT
+            </h1>
+            <p class="hero-subtitle">
+                Intelligence Artificielle • Reconnaissance Faciale • Télécom SudParis
+            </p>
+            <div class="hero-badge">
+                <i class="fas fa-database"></i> 
+                <span id="studentCount">1,247</span> étudiants référencés
+            </div>
+        </div>
+        
+        <!-- Upload Card -->
+        <div class="card mb-5" style="animation: fadeInUp 0.8s ease-out 0.6s backwards;">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-camera-retro"></i> Identification Faciale
+                </h3>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4" style="font-size: 1.1rem;">
+                    <i class="fas fa-info-circle text-primary"></i>
+                    Uploadez une photo pour identifier automatiquement l'étudiant grâce à notre IA avancée.
+                </p>
+                
+                <form method="post" action="{% url 'recognition:upload_photo' %}" enctype="multipart/form-data" id="uploadForm">
+                    {% csrf_token %}
+                    
+                    <!-- Upload Zone -->
+                    <div class="upload-zone mb-4" id="uploadZone">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h5 class="mb-3" style="color: var(--dark); font-weight: 600;">
+                            Glissez votre photo ici
+                        </h5>
+                        <p class="text-muted mb-3">ou</p>
+                        <label for="id_photo" class="btn btn-primary mb-3" style="cursor: pointer;">
+                            <i class="fas fa-folder-open"></i> Parcourir les fichiers
+                        </label>
+                        <input type="file" 
+                               id="id_photo" 
+                               name="photo" 
+                               accept="image/jpeg,image/png,image/jpg" 
+                               style="display: none;">
+                        <p class="text-muted small mb-0">
+                            <i class="fas fa-check-circle text-success"></i> JPG, PNG • Max 10 MB • Haute résolution recommandée
+                        </p>
+                    </div>
+                    
+                    <!-- Preview de l'image -->
+                    <div id="imagePreview" class="text-center mb-4" style="display: none;">
+                        <div style="position: relative; display: inline-block;">
+                            <img id="preview" src="" alt="Aperçu">
+                            <button type="button" class="btn btn-danger" id="removeImage" 
+                                    style="position: absolute; top: 10px; right: 10px; border-radius: 50%; width: 40px; height: 40px; padding: 0;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="mt-3">
+                            <span class="badge bg-success" style="font-size: 1rem; padding: 10px 20px; border-radius: 10px;">
+                                <i class="fas fa-check"></i> Photo chargée avec succès
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                            <i class="fas fa-magic"></i> Lancer l'analyse IA
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Feature Cards -->
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card" style="animation: fadeInUp 0.8s ease-out 0.8s backwards;">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h5 class="feature-title">Intelligence Artificielle</h5>
+                    <p class="feature-text">
+                        Algorithmes de deep learning pour une reconnaissance faciale ultra-précise
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card" style="animation: fadeInUp 0.8s ease-out 1s backwards;">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h5 class="feature-title">Ultra-Rapide</h5>
+                    <p class="feature-text">
+                        Analyse et identification en moins de 2 secondes grâce aux GPU
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card" style="animation: fadeInUp 0.8s ease-out 1.2s backwards;">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h5 class="feature-title">100% Sécurisé</h5>
+                    <p class="feature-text">
+                        Données cryptées et conformité RGPD garantie
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Section -->
+        <div class="card mt-5" style="animation: fadeInUp 0.8s ease-out 1.4s backwards; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));">
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="mb-2">
+                            <i class="fas fa-chart-line" style="font-size: 2.5rem; color: var(--primary);"></i>
+                        </div>
+                        <h3 class="mb-0" style="color: var(--primary); font-weight: 700;">99.2%</h3>
+                        <p class="text-muted mb-0">Précision</p>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-2">
+                            <i class="fas fa-users" style="font-size: 2.5rem; color: var(--secondary);"></i>
+                        </div>
+                        <h3 class="mb-0" style="color: var(--secondary); font-weight: 700;">1,247</h3>
+                        <p class="text-muted mb-0">Étudiants</p>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-2">
+                            <i class="fas fa-images" style="font-size: 2.5rem; color: var(--accent);"></i>
+                        </div>
+                        <h3 class="mb-0" style="color: var(--accent); font-weight: 700;">3,542</h3>
+                        <p class="text-muted mb-0">Photos analysées</p>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-2">
+                            <i class="fas fa-clock" style="font-size: 2.5rem; color: #10b981;"></i>
+                        </div>
+                        <h3 class="mb-0" style="color: #10b981; font-weight: 700;">1.8s</h3>
+                        <p class="text-muted mb-0">Temps moyen</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('id_photo');
+    const imagePreview = document.getElementById('imagePreview');
+    const preview = document.getElementById('preview');
+    const removeBtn = document.getElementById('removeImage');
+    const submitBtn = document.getElementById('submitBtn');
+    const uploadForm = document.getElementById('uploadForm');
+    
+    // Click sur la zone d'upload
+    uploadZone.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'LABEL' && e.target.tagName !== 'INPUT') {
+            fileInput.click();
+        }
+    });
+    
+    // Drag & Drop
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+    });
+    
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('dragover');
+    });
+    
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            handleFileSelect(files[0]);
+        }
+    });
+    
+    // Changement de fichier
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFileSelect(e.target.files[0]);
+        }
+    });
+    
+    // Gestion de l'affichage de l'aperçu
+    function handleFileSelect(file) {
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                preview.src = e.target.result;
+                uploadZone.style.display = 'none';
+                imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    // Bouton supprimer l'image
+    removeBtn.addEventListener('click', () => {
+        fileInput.value = '';
+        preview.src = '';
+        imagePreview.style.display = 'none';
+        uploadZone.style.display = 'block';
+    });
+    
+    // Animation du bouton pendant l'upload
+    uploadForm.addEventListener('submit', (e) => {
+        if (!fileInput.files.length) {
+            e.preventDefault();
+            alert('Veuillez sélectionner une photo !');
+            return;
+        }
+        
+        submitBtn.innerHTML = '<i class="fas fa-spinner spinner"></i> Analyse en cours...';
+        submitBtn.disabled = true;
+    });
+    
+    // Animation du compteur
+    function animateCounter() {
+        const counter = document.getElementById('studentCount');
+        let count = 0;
+        const target = 1247;
+        const duration = 2000;
+        const increment = target / (duration / 16);
+        
+        const timer = setInterval(() => {
+            count += increment;
+            if (count >= target) {
+                counter.textContent = target.toLocaleString('fr-FR');
+                clearInterval(timer);
+            } else {
+                counter.textContent = Math.floor(count).toLocaleString('fr-FR');
+            }
+        }, 16);
+    }
+    
+    // Lancer l'animation au chargement
+    window.addEventListener('load', animateCounter);
+</script>
+{% endblock %}
