@@ -56,3 +56,11 @@ def preview(request):
     }
 
     return render(request, 'recognition/preview.html', context)
+
+# Pages d'erreur personnalisées comme il était indiqué dans l'ancien critère d'évaluation
+def error_404(request, exception):
+    return render(request, 'recognition/404.html', status=404)
+
+
+def error_500(request):
+    return render(request, 'recognition/500.html', status=500)
