@@ -32,7 +32,6 @@ class StudentAdmin(admin.ModelAdmin):
     )
 
     def photo_preview(self, obj):
-        """Miniature de la photo dans la liste"""
         if obj.photo:
             html = f'<img src="{obj.photo.url}" width="50" height="50" style="object-fit: cover; border-radius: 50%; border: 2px solid #00ff88;" />'
             return mark_safe(html)
@@ -42,7 +41,6 @@ class StudentAdmin(admin.ModelAdmin):
     photo_preview.short_description = "Photo"
 
     def photo_preview_large(self, obj):
-        """Grande photo dans le détail"""
         if obj.photo:
             html = f'<img src="{obj.photo.url}" style="max-width: 300px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);" />'
             return mark_safe(html)
@@ -51,7 +49,6 @@ class StudentAdmin(admin.ModelAdmin):
     photo_preview_large.short_description = "Aperçu photo"
 
     def full_name(self, obj):
-        """Nom complet avec style"""
         html = f'<strong style="color: #00ff88;">{obj.get_full_name()}</strong>'
         return mark_safe(html)
 

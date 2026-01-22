@@ -2,7 +2,6 @@ from django import forms
 
 
 class PhotoUploadForm(forms.Form):
-    """Formulaire simple pour uploader une photo (sans stockage)"""
 
     photo = forms.ImageField(
         label='',
@@ -16,7 +15,6 @@ class PhotoUploadForm(forms.Form):
     )
 
     def clean_photo(self):
-        """Validation de la photo"""
         photo = self.cleaned_data.get('photo')
 
         if photo:

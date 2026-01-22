@@ -5,15 +5,6 @@ import io
 
 
 def encode_student_faces(student):
-    """
-    Encode le visage d'un étudiant et sauvegarde l'encodage
-
-    Args:
-        student: Instance du modèle Student
-
-    Returns:
-        bool: True si l'encodage a réussi, False sinon
-    """
     if not student.photo:
         print(f"❌ Pas de photo pour {student.get_full_name()}")
         return False
@@ -51,20 +42,11 @@ def encode_student_faces(student):
 
 
 def find_matching_students(uploaded_photo_path, threshold=0.6):
-    """
-    Trouve les étudiants qui correspondent à une photo uploadée
 
-    Args:
-        uploaded_photo_path: Chemin vers la photo uploadée
-        threshold: Seuil de distance (plus bas = plus strict). Par défaut 0.6
-
-    Returns:
-        list: Liste de tuples (student, similarity_score) triés par score décroissant
-    """
     from .models import Student
 
     try:
-        # Charger l'image uploadée
+
         uploaded_image = face_recognition.load_image_file(uploaded_photo_path)
 
         # Détecter les visages
@@ -86,7 +68,6 @@ def find_matching_students(uploaded_photo_path, threshold=0.6):
 
         uploaded_encoding = uploaded_encodings[0]
 
-        # Récupérer tous les étudiants avec encodage
         students = Student.objects.exclude(face_encoding__isnull=True).exclude(face_encoding='')
 
         if students.count() == 0:
@@ -100,13 +81,13 @@ def find_matching_students(uploaded_photo_path, threshold=0.6):
                 student_encoding = student.get_face_encoding()
 
                 if student_encoding is not None:
-                    # Calculer la distance (plus c'est bas, plus c'est similaire)
+
                     distance = face_recognition.face_distance([student_encoding], uploaded_encoding)[0]
 
-                    # Convertir la distance en score de similarité (0-100%)
+
                     similarity = (1 - distance) * 100
 
-                    # Ne garder que si en dessous du seuil
+
                     if distance <= threshold:
                         matches.append({
                             'student': student,
@@ -118,7 +99,7 @@ def find_matching_students(uploaded_photo_path, threshold=0.6):
                 print(f"⚠️  Erreur pour {student.get_full_name()}: {str(e)}")
                 continue
 
-        # Trier par similarité décroissante
+
         matches.sort(key=lambda x: x['similarity'], reverse=True)
 
         print(f"✅ {len(matches)} correspondance(s) trouvée(s)")
