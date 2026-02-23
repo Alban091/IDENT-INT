@@ -1,0 +1,168 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+
+{% block content %}
+<style>
+    .sync-container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+    }
+    .sync-form {
+        background: #f8f9fa;
+        padding: 25px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+    }
+    .sync-form label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        margin-top: 15px;
+    }
+    .sync-form input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-family: monospace;
+    }
+    .sync-form select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    .sync-form .helptext {
+        color: #666;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+    .sync-form .checkbox-list {
+        margin-top: 10px;
+    }
+    .sync-form .checkbox-list label {
+        display: inline;
+        font-weight: normal;
+        margin-left: 5px;
+    }
+    .sync-form .checkbox-list li {
+        list-style: none;
+        margin: 8px 0;
+    }
+    .submit-row {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #ddd;
+    }
+    .submit-row input[type="submit"] {
+        background: #417690;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+    }
+    .submit-row input[type="submit"]:hover {
+        background: #205067;
+    }
+    .instructions {
+        background: #e7f3ff;
+        border: 1px solid #b3d7ff;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        color: #333;
+    }
+    .instructions h3 {
+        margin-top: 0;
+        color: #0056b3;
+    }
+    .instructions ol {
+        margin-bottom: 0;
+        padding-left: 20px;
+        color: #333;
+    }
+    .instructions li {
+        margin: 8px 0;
+        color: #333;
+    }
+    .instructions code {
+        background: #fff;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: monospace;
+        color: #333;
+    }
+    .sync-form label {
+        color: #333 !important;
+    }
+    .sync-form .helptext {
+        color: #666 !important;
+    }
+    .sync-form .checkbox-list label {
+        color: #333 !important;
+    }
+    .back-link {
+        margin-bottom: 20px;
+    }
+    .back-link a {
+        color: #417690;
+        text-decoration: none;
+    }
+    .back-link a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="sync-container">
+    <div class="back-link">
+        <a href="../">← Retour à la liste des étudiants</a>
+    </div>
+
+    <h1>🔄 Synchroniser le Trombinoscope TSP</h1>
+
+    <div class="instructions">
+        <h3>📋 Comment récupérer ton cookie ?</h3>
+        <ol>
+            <li>Va sur <a href="https://trombi.imtbs-tsp.eu/etudiants.php" target="_blank">trombi.imtbs-tsp.eu</a></li>
+            <li>Connecte-toi avec ton compte TSP</li>
+            <li>Ouvre les DevTools : <code>Cmd + Option + I</code> (Mac) ou <code>F12</code> (Windows)</li>
+            <li>Va dans <strong>Application</strong> → <strong>Cookies</strong> → <code>trombi.imtbs-tsp.eu</code></li>
+            <li>Copie la valeur de <strong>PHPSESSID</strong></li>
+        </ol>
+    </div>
+
+    <form method="post" class="sync-form">
+        {% csrf_token %}
+
+        <label for="id_cookie">🔑 Cookie PHPSESSID</label>
+        {{ form.cookie }}
+        <p class="helptext">{{ form.cookie.help_text }}</p>
+
+        <label for="id_ecole">🏫 École</label>
+        {{ form.ecole }}
+
+        <label>📅 Années à synchroniser</label>
+        <ul class="checkbox-list">
+            {{ form.annees }}
+        </ul>
+
+        <label style="display: inline; font-weight: normal;">
+            {{ form.download_photos }} 📸 Télécharger les photos
+        </label>
+        <p class="helptext">{{ form.download_photos.help_text }}</p>
+
+        <label style="display: inline; font-weight: normal; margin-top: 15px; display: block;">
+            {{ form.encode_faces }} 🤖 Encoder les visages automatiquement
+        </label>
+        <p class="helptext">{{ form.encode_faces.help_text }}</p>
+
+        <div class="submit-row">
+            <input type="submit" value="🚀 Lancer la synchronisation">
+        </div>
+    </form>
+</div>
+{% endblock %}
