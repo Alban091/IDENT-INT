@@ -1,0 +1,67 @@
+{% extends "recognition/base.html" %}
+
+{% block title %}Connexion - TSP IDENTINT{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center" style="margin-top: 50px;">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h2 style="color: var(--primary-green); margin-bottom: 10px;">
+                        <i class="fas fa-lock"></i> Connexion Admin
+                    </h2>
+                    <p class="text-muted mb-4">Connecte-toi pour accéder aux fonctions d'administration</p>
+
+                    {% if form.errors %}
+                    <div class="alert alert-danger" style="background: rgba(220, 53, 69, 0.2); border-color: rgba(220, 53, 69, 0.5); color: #ff6b6b;">
+                        <i class="fas fa-exclamation-circle"></i> Identifiants incorrects
+                    </div>
+                    {% endif %}
+
+                    <form method="post" class="text-start">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-user"></i> Nom d'utilisateur
+                            </label>
+                            <input type="text"
+                                   name="username"
+                                   id="username"
+                                   class="form-control"
+                                   placeholder="admin"
+                                   required
+                                   autofocus
+                                   style="background: var(--dark-bg); border-color: rgba(255,255,255,0.2); color: white;">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-key"></i> Mot de passe
+                            </label>
+                            <input type="password"
+                                   name="password"
+                                   id="password"
+                                   class="form-control"
+                                   placeholder="••••••••"
+                                   required
+                                   style="background: var(--dark-bg); border-color: rgba(255,255,255,0.2); color: white;">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-sign-in-alt"></i> Se connecter
+                        </button>
+                    </form>
+
+                    <hr style="border-color: rgba(255,255,255,0.1); margin: 25px 0;">
+
+                    <a href="{% url 'recognition:home' %}" class="text-muted">
+                        <i class="fas fa-arrow-left"></i> Retour à l'accueil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

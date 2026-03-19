@@ -36,8 +36,25 @@
         body {
             font-family: 'Poppins', sans-serif;
             background: var(--dark-bg);
-            color: var(--text-light);
+            color: #ffffff;
             overflow-x: hidden;
+        }
+
+        /* Textes bien visibles */
+        p, span, label, li, a {
+            color: #ffffff;
+        }
+
+        .text-muted {
+            color: #cccccc !important;
+        }
+
+        .form-label {
+            color: #ffffff !important;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: #ffffff;
         }
 
         /* Navbar moderne */
@@ -87,6 +104,17 @@
 
         .nav-link.active {
             color: var(--primary-green) !important;
+        }
+
+        /* Bouton Admin spécial */
+        .nav-link.admin-link {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid rgba(255, 193, 7, 0.5);
+        }
+
+        .nav-link.admin-link:hover {
+            background: rgba(255, 193, 7, 0.3);
+            color: #ffc107 !important;
         }
 
         /* Main content */
@@ -148,115 +176,22 @@
             color: var(--dark-bg);
         }
 
-        /* Titles */
-        h1, h2, h3, h4, h5, h6 {
-            color: white;
-            font-weight: 700;
-        }
-
-        .text-primary {
-            color: var(--primary-green) !important;
-        }
-
-        .text-muted {
-            color: var(--text-muted) !important;
-        }
-
-        /* Accents verts */
-        .accent-line {
-            width: 60px;
-            height: 4px;
-            background: var(--primary-green);
-            border-radius: 2px;
-            margin: 1rem 0;
-        }
-
-        /* Glow effects */
-        .glow-green {
-            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
-        }
-
-        /* Alerts */
-        .alert {
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            border-radius: 12px;
-            color: var(--text-light);
-        }
-
-        .alert-info {
-            background: rgba(59, 130, 246, 0.1);
-            border-color: rgba(59, 130, 246, 0.3);
-        }
-
-        .alert-warning {
-            background: rgba(245, 158, 11, 0.1);
-            border-color: rgba(245, 158, 11, 0.3);
-        }
-
-        .alert-danger {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.3);
-        }
-
-        /* Badge */
-        .badge {
-            background: rgba(0, 255, 136, 0.15);
-            color: var(--primary-green);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            border: 1px solid rgba(0, 255, 136, 0.3);
-        }
-
-        /* Forms */
-        .form-control, .form-select {
+        /* Footer */
+        .footer {
             background: var(--darker-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-light);
-            padding: 12px 20px;
-            border-radius: 10px;
-            transition: all 0.3s ease;
+            padding: 2rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 3rem;
         }
 
-        .form-control:focus, .form-select:focus {
-            background: var(--darker-bg);
-            border-color: var(--primary-green);
-            color: var(--text-light);
-            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Icons */
-        .icon-box {
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 255, 136, 0.1);
-            border: 2px solid var(--primary-green);
-            border-radius: 50%;
-            font-size: 1.5rem;
-            color: var(--primary-green);
-            margin-bottom: 1rem;
-        }
-
-        /* Scrollbar personnalisée */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--darker-bg);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-green);
-            border-radius: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #00e67a;
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease forwards;
         }
     </style>
 
@@ -280,6 +215,37 @@
                             <i class="fas fa-home"></i> Accueil
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'recognition:about' %}">
+                            <i class="fas fa-info-circle"></i> À propos
+                        </a>
+                    </li>
+
+                    {% if user.is_authenticated %}
+                        {% if user.is_staff %}
+                        <li class="nav-item">
+                            <a class="nav-link admin-link" href="/admin/recognition/student/sync_trombi/">
+                                <i class="fas fa-sync-alt"></i> Sync Trombi
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link admin-link" href="/admin/">
+                                <i class="fas fa-cog"></i> Admin
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'recognition:logout' %}" style="color: #ff6b6b !important;">
+                                <i class="fas fa-sign-out-alt"></i> Déconnexion ({{ user.username }})
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'recognition:login' %}" style="background: rgba(0, 255, 136, 0.2); border: 1px solid var(--primary-green);">
+                                <i class="fas fa-sign-in-alt"></i> Connexion
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -299,11 +265,18 @@
     {% endif %}
 
     <!-- Main Content -->
-    <div class="main-content">
-        <div class="container">
-            {% block content %}{% endblock %}
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container text-center">
+            <p class="text-muted mb-0">
+                © 2024 TSP IDENTINT - Télécom SudParis
+            </p>
         </div>
-    </div>
+    </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
