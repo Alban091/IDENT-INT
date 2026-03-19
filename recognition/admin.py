@@ -2,19 +2,19 @@
 Vue Admin personnalisée pour synchroniser le trombinoscope TSP
 ==============================================================
 
-Ce fichier ajoute une page dans l'admin Django avec un formulaire
-pour entrer le cookie PHPSESSID et lancer la synchronisation.
+S'authentifie automatiquement avec login/mot de passe TSP (via CAS).
 
 INSTALLATION:
-1. Copie ce fichier dans recognition/admin.py (remplace le contenu existant)
-2. Relance le serveur: python manage.py runserver
-3. Va sur http://127.0.0.1:8000/admin/recognition/student/sync_trombi/
+1. Copie ce fichier dans recognition/admin.py
+2. Copie le template sync_trombi.html dans recognition/templates/admin/recognition/student/
+3. Relance le serveur: python manage.py runserver
+4. Va sur http://127.0.0.1:8000/admin/recognition/student/sync_trombi/
 """
 
 import re
 import time
 import requests
-from io import BytesIO
+from urllib.parse import urljoin
 
 from django.contrib import admin, messages
 from django.shortcuts import render, redirect
@@ -37,14 +37,26 @@ except ImportError:
 class TrombiSyncForm(forms.Form):
     """Formulaire pour la synchronisation du trombinoscope"""
 
-    cookie = forms.CharField(
-        label="Cookie PHPSESSID",
+    username = forms.CharField(
+        label="Login TSP",
         widget=forms.TextInput(attrs={
             'class': 'vTextField',
-            'style': 'width: 400px;',
-            'placeholder': 'Colle ton cookie PHPSESSID ici'
+            'style': 'width: 300px;',
+            'placeholder': 'ton_login',
+            'autocomplete': 'username',
         }),
-        help_text="Récupère-le dans DevTools > Application > Cookies après t'être connecté sur trombi.imtbs-tsp.eu"
+        help_text="Ton identifiant TSP (ex: arobert)"
+    )
+
+    password = forms.CharField(
+        label="Mot de passe",
+        widget=forms.PasswordInput(attrs={
+            'class': 'vTextField',
+            'style': 'width: 300px;',
+            'placeholder': '••••••••',
+            'autocomplete': 'current-password',
+        }),
+        help_text="Ton mot de passe TSP"
     )
 
     ecole = forms.ChoiceField(
@@ -75,7 +87,6 @@ class TrombiSyncForm(forms.Form):
         label="Télécharger les photos",
         initial=True,
         required=False,
-        help_text="Décocher pour importer seulement les noms et emails"
     )
 
     encode_faces = forms.BooleanField(
@@ -87,40 +98,77 @@ class TrombiSyncForm(forms.Form):
 
 
 # =============================================================================
-# SCRAPER (version simplifiée intégrée)
+# SCRAPER AVEC AUTHENTIFICATION CAS
 # =============================================================================
 
 class TrombiScraper:
-    """Scraper pour le trombinoscope TSP"""
+    """Scraper pour le trombinoscope TSP avec authentification CAS"""
 
     BASE_URL = "https://trombi.imtbs-tsp.eu"
+    LOGIN_URL = "https://trombi.imtbs-tsp.eu/etudiants.php?login"
     ETUDIANTS_URL = "https://trombi.imtbs-tsp.eu/etudiants.php"
     PHOTO_URL = "https://trombi.imtbs-tsp.eu/photo.php"
 
-    def __init__(self, cookie):
+    def __init__(self):
         self.session = requests.Session()
-        self.session.cookies.set('PHPSESSID', cookie, domain='trombi.imtbs-tsp.eu')
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-            'Referer': self.ETUDIANTS_URL,
         })
+        self.authenticated = False
 
-    def test_connection(self):
-        """Teste si le cookie est valide"""
+    def authenticate(self, username, password):
+        """S'authentifie via CAS de l'IMT"""
         try:
-            response = self.session.get(self.ETUDIANTS_URL, timeout=10)
+            # 1. Aller sur la page de login (redirige vers CAS)
+            response = self.session.get(self.LOGIN_URL, allow_redirects=True, timeout=15)
+
+            # 2. Parser le formulaire CAS
+            soup = BeautifulSoup(response.text, 'html.parser')
+            form = soup.find('form')
+
+            if not form:
+                print("Formulaire CAS non trouvé")
+                return False
+
+            # URL d'action du formulaire
+            action = form.get('action', '')
+            if not action.startswith('http'):
+                action = urljoin(response.url, action)
+
+            # Récupérer tous les champs cachés (tokens CSRF, etc.)
+            data = {}
+            for input_tag in form.find_all('input'):
+                name = input_tag.get('name')
+                value = input_tag.get('value', '')
+                if name:
+                    data[name] = value
+
+            # Ajouter les identifiants
+            data['username'] = username
+            data['password'] = password
+
+            # 3. Soumettre le formulaire
+            response = self.session.post(action, data=data, allow_redirects=True, timeout=15)
+
+            # 4. Vérifier si connecté
             if 'Connexion</span></a>' in response.text and '?login' in response.text:
                 return False
+
+            self.authenticated = True
             return True
-        except:
+
+        except Exception as e:
+            print(f"Erreur auth: {e}")
             return False
 
-    def search(self, ecole='', annee='', nom=''):
+    def search(self, ecole='', annee=''):
         """Recherche des étudiants"""
-        students = []
+        if not self.authenticated:
+            return []
 
+        students = []
         data = {
-            'etu[user]': nom,
+            'etu[user]': '',
             'etu[ecole]': ecole,
             'etu[annee]': annee,
         }
@@ -134,7 +182,7 @@ class TrombiScraper:
                 if student:
                     students.append(student)
         except Exception as e:
-            print(f"Erreur: {e}")
+            print(f"Erreur recherche: {e}")
 
         return students
 
@@ -190,7 +238,7 @@ class TrombiScraper:
             return None
 
     def download_photo(self, photo_url):
-        """Télécharge une photo et retourne les bytes"""
+        """Télécharge une photo"""
         try:
             response = self.session.get(photo_url, timeout=15)
             if response.status_code == 200 and len(response.content) > 100:
@@ -208,12 +256,17 @@ class TrombiScraper:
 class StudentAdmin(admin.ModelAdmin):
     """Admin pour les étudiants avec bouton de synchronisation"""
 
+    # Template personnalisé avec bouton Sync
+    change_list_template = 'admin/recognition/student/change_list.html'
+
     list_display = ['last_name', 'first_name', 'email', 'school', 'year', 'has_photo', 'has_encoding']
     list_filter = ['school', 'year']
     search_fields = ['first_name', 'last_name', 'email']
     ordering = ['last_name', 'first_name']
 
     readonly_fields = ['created_at', 'updated_at']
+
+    actions = ['encode_faces']
 
     fieldsets = (
         ('Identité', {
@@ -237,15 +290,27 @@ class StudentAdmin(admin.ModelAdmin):
 
     def has_photo(self, obj):
         return bool(obj.photo)
-
     has_photo.boolean = True
     has_photo.short_description = "Photo"
 
     def has_encoding(self, obj):
         return bool(obj.face_encoding)
-
     has_encoding.boolean = True
     has_encoding.short_description = "Encodage"
+
+    # Action pour encoder les visages manuellement
+    def encode_faces(self, request, queryset):
+        try:
+            from .face_recognition_utils import encode_student_faces
+            count = 0
+            for student in queryset:
+                if student.photo and not student.face_encoding:
+                    if encode_student_faces(student):
+                        count += 1
+            self.message_user(request, f"✅ {count} visage(s) encodé(s)")
+        except ImportError:
+            self.message_user(request, "❌ face_recognition non installé", level=messages.ERROR)
+    encode_faces.short_description = "🤖 Encoder les visages sélectionnés"
 
     # =========================================================================
     # URLS PERSONNALISÉES
@@ -265,28 +330,26 @@ class StudentAdmin(admin.ModelAdmin):
     def sync_trombi_view(self, request):
         """Vue pour synchroniser le trombinoscope"""
 
-        # Vérifier que BeautifulSoup est installé
         if BeautifulSoup is None:
-            messages.error(request, "BeautifulSoup n'est pas installé. Lance: pip install beautifulsoup4")
+            messages.error(request, "❌ BeautifulSoup non installé. Lance: pip install beautifulsoup4")
             return redirect('..')
 
         if request.method == 'POST':
             form = TrombiSyncForm(request.POST)
 
             if form.is_valid():
-                cookie = form.cleaned_data['cookie']
+                username = form.cleaned_data['username']
+                password = form.cleaned_data['password']
                 ecole = form.cleaned_data['ecole']
                 annees = form.cleaned_data['annees']
                 download_photos = form.cleaned_data['download_photos']
                 encode_faces_option = form.cleaned_data['encode_faces']
 
-                # Créer le scraper
-                scraper = TrombiScraper(cookie)
+                # Créer le scraper et s'authentifier
+                scraper = TrombiScraper()
 
-                # Tester la connexion
-                if not scraper.test_connection():
-                    messages.error(request,
-                                   "❌ Cookie invalide ou expiré. Reconnecte-toi sur trombi.imtbs-tsp.eu et récupère un nouveau cookie.")
+                if not scraper.authenticate(username, password):
+                    messages.error(request, "❌ Échec de connexion. Vérifie ton login/mot de passe TSP.")
                     return redirect('.')
 
                 # Définir les écoles
@@ -313,7 +376,7 @@ class StudentAdmin(admin.ModelAdmin):
                 except ImportError:
                     can_encode = False
 
-                # Importer
+                # Importer les étudiants
                 created = 0
                 updated = 0
                 encoded = 0
@@ -332,19 +395,22 @@ class StudentAdmin(admin.ModelAdmin):
                         )
 
                         # Télécharger la photo
+                        photo_downloaded = False
                         if download_photos and data['photo_url'] and not student.photo:
                             photo_content = scraper.download_photo(data['photo_url'])
                             if photo_content:
                                 filename = f"{data['uid']}.jpg"
                                 student.photo.save(filename, ContentFile(photo_content), save=True)
+                                photo_downloaded = True
 
                         # Encoder le visage automatiquement
-                        if encode_faces_option and can_encode and student.photo and not student.face_encoding:
-                            try:
-                                if encode_student_faces(student):
-                                    encoded += 1
-                            except Exception as e:
-                                print(f"Erreur encodage {student}: {e}")
+                        if encode_faces_option and can_encode and student.photo:
+                            if photo_downloaded or not student.face_encoding:
+                                try:
+                                    if encode_student_faces(student):
+                                        encoded += 1
+                                except Exception as e:
+                                    print(f"Erreur encodage {student}: {e}")
 
                         if was_created:
                             created += 1
@@ -355,8 +421,10 @@ class StudentAdmin(admin.ModelAdmin):
                         print(f"Erreur: {e}")
                         continue
 
-                messages.success(request,
-                                 f"✅ Synchronisation terminée ! {created} créés, {updated} mis à jour, {encoded} visages encodés.")
+                messages.success(
+                    request,
+                    f"✅ Synchronisation terminée ! {created} créés, {updated} mis à jour, {encoded} visages encodés."
+                )
                 return redirect('..')
 
         else:
@@ -371,11 +439,13 @@ class StudentAdmin(admin.ModelAdmin):
 
         return render(request, 'admin/recognition/student/sync_trombi.html', context)
 
-    # =========================================================================
-    # AJOUTER LE BOUTON DANS LA LISTE
-    # =========================================================================
-
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
         extra_context['show_sync_button'] = True
         return super().changelist_view(request, extra_context=extra_context)
+
+
+# Personnaliser le site admin
+admin.site.site_header = "TSP IDENTINT - Administration"
+admin.site.site_title = "TSP IDENTINT Admin"
+admin.site.index_title = "Gestion de la reconnaissance faciale"

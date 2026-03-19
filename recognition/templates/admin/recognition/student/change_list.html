@@ -1,0 +1,10 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools-items %}
+    <li>
+        <a href="sync_trombi/" class="button" style="background: #00a86b; padding: 8px 15px;">
+            🔄 Synchroniser le Trombinoscope
+        </a>
+    </li>
+    {{ block.super }}
+{% endblock %}
