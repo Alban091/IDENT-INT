@@ -100,3 +100,6 @@ def error_500(request):
 def about(request):
     """Page À propos - Présentation du projet"""
     return render(request, 'recognition/about.html')
+
+def legal(request):
+    return render(request, 'recognition/legal.html')

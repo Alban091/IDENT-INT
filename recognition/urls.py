@@ -17,6 +17,7 @@ urlpatterns = [
     path('upload/', views.upload_photo, name='upload_photo'),
     path('preview/', views.preview, name='preview'),
     path('about/', views.about, name='about'),
+    path('legal/', views.legal, name='legal'),
 
     # Authentification
     path('login/', auth_views.LoginView.as_view(

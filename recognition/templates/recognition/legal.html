@@ -1,0 +1,29 @@
+{% extends "recognition/base.html" %}
+
+{% block title %}Mentions légales - TSP IDENTINT{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin-top: 40px; margin-bottom: 60px;">
+    <h1 style="color: var(--primary-green);">Mentions légales et éthique</h1>
+
+    <h2 style="margin-top: 30px;">Cadre du projet</h2>
+    <p>TSP IDENTINT est un projet pédagogique réalisé dans le cadre d'un cours de Python
+    à Télécom SudParis. Il n'est pas destiné à être déployé publiquement ni à un usage commercial.</p>
+
+    <h2 style="margin-top: 30px;">Données traitées</h2>
+    <p>Les photos des étudiants proviennent du trombinoscope interne de TSP/IMT-BS,
+    accessible uniquement aux membres de l'établissement après authentification.
+    Les encodages faciaux générés (vecteurs numériques de 128 dimensions) sont stockés
+    localement et ne sont ni partagés ni publiés en ligne.</p>
+
+    <h2 style="margin-top: 30px;">Base légale (RGPD)</h2>
+    <p>Les données biométriques sont des données sensibles au sens de l'article 9 du RGPD.
+    Le traitement réalisé ici est strictement limité à un usage pédagogique et interne.
+    Aucune donnée n'est transmise à un tiers.</p>
+
+    <h2 style="margin-top: 30px;">Droit à l'effacement</h2>
+    <p>Conformément à l'article 17 du RGPD, toute personne figurant dans la base peut
+    demander la suppression de sa photo et de son encodage facial. Pour exercer ce droit,
+    contactez : <strong>alban.robert@telecom-sudparis.eu</strong></p>
+</div>
+{% endblock %}
