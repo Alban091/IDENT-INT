@@ -1,154 +1,61 @@
 import face_recognition
 import numpy as np
-from PIL import Image
-import io
+
+
+def crop_face(image_path, margin=0.3):
+    image = face_recognition.load_image_file(image_path)
+    locations = face_recognition.face_locations(image)
+    if not locations:
+        return None
+    top, right, bottom, left = max(locations, key=lambda b: (b[2]-b[0])*(b[1]-b[3]))
+    h, w = image.shape[:2]
+    dy, dx = int((bottom - top) * margin), int((right - left) * margin)
+    top = max(0, top - dy)
+    bottom = min(h, bottom + dy)
+    left = max(0, left - dx)
+    right = min(w, right + dx)
+    return np.ascontiguousarray(image[top:bottom, left:right])
 
 
 def encode_student_faces(student):
     if not student.photo:
-        print(f"❌ Pas de photo pour {student.get_full_name()}")
         return False
-
-    try:
-        # Charger l'image
-        image = face_recognition.load_image_file(student.photo.path)
-
-        # Détecter les visages
-        face_locations = face_recognition.face_locations(image)
-
-        if len(face_locations) == 0:
-            print(f"⚠️  Aucun visage détecté pour {student.get_full_name()}")
-            return False
-
-        if len(face_locations) > 1:
-            print(f"⚠️  Plusieurs visages détectés pour {student.get_full_name()}, utilisation du premier")
-
-        # Encoder le visage
-        face_encodings = face_recognition.face_encodings(image, face_locations)
-
-        if len(face_encodings) > 0:
-            # Sauvegarder l'encodage
-            student.set_face_encoding(face_encodings[0])
-            student.save()
-            print(f"✅ Visage encodé pour {student.get_full_name()}")
-            return True
-        else:
-            print(f"❌ Impossible d'encoder le visage de {student.get_full_name()}")
-            return False
-
-    except Exception as e:
-        print(f"❌ Erreur lors de l'encodage de {student.get_full_name()}: {str(e)}")
+    cropped = crop_face(student.photo.path)
+    if cropped is None:
+        print(f"⚠️  Pas de visage détecté pour {student.get_full_name()}")
         return False
+    encodings = face_recognition.face_encodings(cropped)
+    if not encodings:
+        return False
+    student.set_face_encoding(encodings[0])
+    student.save()
+    return True
 
 
-def find_matching_students(uploaded_photo_path, threshold=0.6):
-
+def find_matching_students(uploaded_photo_path, top_k=10):
     from .models import Student
 
-    try:
+    cropped = crop_face(uploaded_photo_path)
+    if cropped is None:
+        return {'error': 'Aucun visage détecté sur la photo', 'matches': []}
 
-        uploaded_image = face_recognition.load_image_file(uploaded_photo_path)
+    encodings = face_recognition.face_encodings(cropped)
+    if not encodings:
+        return {'error': "Impossible d'encoder le visage", 'matches': []}
+    query = encodings[0]
 
-        # Détecter les visages
-        face_locations = face_recognition.face_locations(uploaded_image)
+    students = list(Student.objects.exclude(face_encoding__isnull=True).exclude(face_encoding=''))
+    if not students:
+        return {'error': 'Aucun étudiant avec encodage facial dans la base', 'matches': []}
 
-        if len(face_locations) == 0:
-            print("❌ Aucun visage détecté sur la photo uploadée")
-            return []
+    matrix = np.array([s.get_face_encoding() for s in students])
+    distances = np.linalg.norm(matrix - query, axis=1)
 
-        if len(face_locations) > 1:
-            print("⚠️  Plusieurs visages détectés, utilisation du premier")
+    order = np.argsort(distances)[:top_k]
+    matches = [{
+        'student': students[i],
+        'distance': float(distances[i]),
+        'similarity': float((1 - distances[i]) * 100),
+    } for i in order]
 
-        # Encoder le visage
-        uploaded_encodings = face_recognition.face_encodings(uploaded_image, face_locations)
-
-        if len(uploaded_encodings) == 0:
-            print("❌ Impossible d'encoder le visage uploadé")
-            return []
-
-        uploaded_encoding = uploaded_encodings[0]
-
-        students = Student.objects.exclude(face_encoding__isnull=True).exclude(face_encoding='')
-
-        if students.count() == 0:
-            print("⚠️  Aucun étudiant avec encodage facial dans la base")
-            return []
-
-        matches = []
-
-        for student in students:
-            try:
-                student_encoding = student.get_face_encoding()
-
-                if student_encoding is not None:
-
-                    distance = face_recognition.face_distance([student_encoding], uploaded_encoding)[0]
-
-
-                    similarity = (1 - distance) * 100
-
-
-                    if distance <= threshold:
-                        matches.append({
-                            'student': student,
-                            'similarity': similarity,
-                            'distance': distance
-                        })
-
-            except Exception as e:
-                print(f"⚠️  Erreur pour {student.get_full_name()}: {str(e)}")
-                continue
-
-
-        matches.sort(key=lambda x: x['similarity'], reverse=True)
-
-        print(f"✅ {len(matches)} correspondance(s) trouvée(s)")
-
-        return matches
-
-    except Exception as e:
-        print(f"❌ Erreur lors de la recherche : {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return []
-
-
-def analyze_photo_quality(photo_path):
-    """
-    Analyse la qualité d'une photo
-
-    Args:
-        photo_path: Chemin vers la photo
-
-    Returns:
-        dict: Informations sur la qualité de la photo
-    """
-    try:
-        image = face_recognition.load_image_file(photo_path)
-        face_locations = face_recognition.face_locations(image)
-
-        result = {
-            'has_face': len(face_locations) > 0,
-            'face_count': len(face_locations),
-            'is_good_quality': False,
-            'message': ''
-        }
-
-        if len(face_locations) == 0:
-            result['message'] = "Aucun visage détecté"
-        elif len(face_locations) > 1:
-            result[
-                'message'] = f"{len(face_locations)} visages détectés. Veuillez uploader une photo avec une seule personne."
-        else:
-            result['is_good_quality'] = True
-            result['message'] = "Photo de bonne qualité"
-
-        return result
-
-    except Exception as e:
-        return {
-            'has_face': False,
-            'face_count': 0,
-            'is_good_quality': False,
-            'message': f"Erreur: {str(e)}"
-        }
+    return {'error': None, 'matches': matches}

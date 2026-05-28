@@ -17,56 +17,41 @@ def home(request):
 
 
 def upload_photo(request):
-    """Traitement de l'upload de photo (stockage temporaire en session)"""
-    if request.method == 'POST':
-        form = PhotoUploadForm(request.POST, request.FILES)
+    if request.method != 'POST':
+        return redirect('recognition:home')
 
-        if form.is_valid():
-            photo = request.FILES['photo']
+    form = PhotoUploadForm(request.POST, request.FILES)
+    if not form.is_valid():
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(request, error)
+        return redirect('recognition:home')
 
-            # Stocker temporairement dans media/temp/ pour l'affichage
-            temp_path = default_storage.save(f'temp/{photo.name}', ContentFile(photo.read()))
-            full_path = default_storage.path(temp_path)
+    photo = request.FILES['photo']
+    temp_path = default_storage.save(f'temp/{photo.name}', ContentFile(photo.read()))
+    full_path = default_storage.path(temp_path)
 
-            # Analyser la photo avec la reconnaissance faciale
-            from .face_recognition_utils import analyze_photo_quality, find_matching_students
+    from .face_recognition_utils import find_matching_students
+    result = find_matching_students(full_path, top_k=10)
 
-            # Vérifier la qualité
-            quality = analyze_photo_quality(full_path)
+    if result['error']:
+        messages.error(request, result['error'])
+        default_storage.delete(temp_path)
+        return redirect('recognition:home')
 
-            if not quality['is_good_quality']:
-                messages.error(request, quality['message'])
-                # Supprimer la photo temporaire
-                default_storage.delete(temp_path)
-                return redirect('recognition:home')
+    request.session['uploaded_photo_path'] = temp_path
+    request.session['uploaded_photo_name'] = photo.name
+    request.session['matches'] = [
+        {'student_id': m['student'].id, 'similarity': m['similarity']}
+        for m in result['matches']
+    ]
 
-            # Chercher les correspondances
-            matches = find_matching_students(full_path, threshold=0.6)
+    if len(result['matches']) == 0:
+        messages.warning(request, 'Aucune correspondance trouvée dans la base de données.')
+    else:
+        messages.success(request, f"{len(result['matches'])} correspondance(s) trouvée(s) !")
 
-            # Sauvegarder le chemin dans la session
-            request.session['uploaded_photo_path'] = temp_path
-            request.session['uploaded_photo_name'] = photo.name
-            request.session['matches'] = [
-                {
-                    'student_id': m['student'].id,
-                    'similarity': float(m['similarity'])
-                }
-                for m in matches
-            ]
-
-            if len(matches) == 0:
-                messages.warning(request, 'Aucune correspondance trouvée dans la base de données.')
-            else:
-                messages.success(request, f'{len(matches)} correspondance(s) trouvée(s) !')
-
-            return redirect('recognition:preview')
-        else:
-            # Afficher les erreurs
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, error)
-
-    return redirect('recognition:home')
+    return redirect('recognition:preview')
 
 
 def preview(request):
