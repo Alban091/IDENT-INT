@@ -169,4 +169,58 @@
         </div>
     </form>
 </div>
+<style>
+.sync-loading-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(20, 22, 31, 0.85);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.sync-loading-overlay.active { display: flex; }
+.sync-spinner {
+    width: 80px; height: 80px;
+    border: 6px solid rgba(255,255,255,0.2);
+    border-top-color: #00ff88;
+    border-radius: 50%;
+    animation: sync-spin 1s linear infinite;
+}
+@keyframes sync-spin { to { transform: rotate(360deg); } }
+.sync-loading-text {
+    color: white; font-size: 1.3rem;
+    margin-top: 25px; font-weight: 500; text-align: center;
+}
+.sync-loading-subtext {
+    color: rgba(255,255,255,0.6); font-size: 0.95rem;
+    margin-top: 10px; text-align: center;
+    max-width: 500px; padding: 0 20px;
+}
+</style>
+
+<div class="sync-loading-overlay" id="syncLoadingOverlay">
+    <div class="sync-spinner"></div>
+    <div class="sync-loading-text">🔄 Synchronisation en cours...</div>
+    <div class="sync-loading-subtext">
+        Connexion au trombinoscope, téléchargement et encodage des photos.<br>
+        Cela peut prendre plusieurs minutes, ne fermez pas cette page.
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form[method="post"]');
+    const overlay = document.getElementById('syncLoadingOverlay');
+    if (form && overlay) {
+        form.addEventListener('submit', function() {
+            overlay.classList.add('active');
+            const btn = form.querySelector('button[type="submit"], input[type="submit"]');
+            if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+        });
+    }
+});
+</script>
 {% endblock %}
