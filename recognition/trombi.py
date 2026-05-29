@@ -101,7 +101,11 @@ class TrombiScraper:
 
     def download_photo(self, photo_url):
         try:
-            response = self.session.get(photo_url, timeout=15)
+            response = self.session.get(
+                photo_url,
+                headers={'Referer': 'https://trombi.imtbs-tsp.eu/etudiants.php'},
+                timeout=15
+            )
             if response.status_code == 200 and len(response.content) > 100:
                 return response.content
         except Exception:
