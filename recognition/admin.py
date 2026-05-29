@@ -1,4 +1,5 @@
 import time
+from django.utils.html import format_html
 
 from django.contrib import admin, messages
 from django.shortcuts import render, redirect
@@ -74,16 +75,23 @@ class StudentAdmin(admin.ModelAdmin):
     list_filter = ['school', 'year']
     search_fields = ['first_name', 'last_name', 'email']
     ordering = ['last_name', 'first_name']
-    readonly_fields = ['created_at', 'updated_at']
+    readonly_fields = ['created_at', 'updated_at', 'photo_preview']
     actions = ['encode_faces']
 
     fieldsets = (
         ('Identité', {'fields': ('first_name', 'last_name', 'email')}),
         ('Scolarité', {'fields': ('school', 'year', 'promotion')}),
-        ('Photo', {'fields': ('photo', 'photo_url')}),
+        ('Photo', {'fields': ('photo', 'photo_preview', 'photo_url')}),
         ('Reconnaissance faciale', {'fields': ('face_encoding',), 'classes': ('collapse',)}),
         ('Métadonnées', {'fields': ('created_at', 'updated_at'), 'classes': ('collapse',)}),
     )
+
+    def photo_preview(self, obj):
+        if obj.photo:
+            return format_html('<img src="{}" style="max-height: 250px; border-radius: 8px;" />', obj.photo.url)
+        return "Pas de photo"
+
+    photo_preview.short_description = "Aperçu de la photo"
 
     def has_photo(self, obj):
         return bool(obj.photo)
