@@ -31,9 +31,7 @@ class TrombiScraper:
             data['username'] = username
             data['password'] = password
             response = self.session.post(action, data=data, allow_redirects=True, timeout=15)
-            if 'cas.imtbs-tsp.eu' in response.url:
-                return False
-            if 'Connexion</span></a>' in response.text and '?login' in response.text:
+            if 'trombi.imtbs-tsp.eu' not in response.url:
                 return False
             self.authenticated = True
             return True
