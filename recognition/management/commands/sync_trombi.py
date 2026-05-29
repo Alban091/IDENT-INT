@@ -69,6 +69,8 @@ class Command(BaseCommand):
         created = 0
         updated = 0
         encoded = 0
+        photos_real = 0
+        photos_missing = 0
 
         for i, data in enumerate(all_students, 1):
             self.stdout.write(f"[{i}/{len(all_students)}] {data['prenom']} {data['nom_famille']}...", ending=" ")
@@ -92,7 +94,10 @@ class Command(BaseCommand):
                         filename = f"{data['uid']}.jpg"
                         student.photo.save(filename, ContentFile(photo_content), save=True)
                         photo_downloaded = True
-
+                        if len(photo_content) != TrombiScraper.PLACEHOLDER_PHOTO_SIZE:
+                            photos_real += 1
+                        else:
+                            photos_missing += 1
                 if can_encode and student.photo:
                     if photo_downloaded or not student.face_encoding:
                         try:
@@ -116,4 +121,6 @@ class Command(BaseCommand):
         self.stdout.write("\n" + "=" * 50)
         self.stdout.write(self.style.SUCCESS(f"✅ Créés: {created}"))
         self.stdout.write(f"🔄 Mis à jour: {updated}")
+        self.stdout.write(f"📸 Vraies photos téléchargées: {photos_real}")
+        self.stdout.write(f"❌ Sans photo sur le trombi: {photos_missing}")
         self.stdout.write(f"🤖 Encodés: {encoded}")

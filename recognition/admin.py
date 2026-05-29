@@ -162,6 +162,8 @@ class StudentAdmin(admin.ModelAdmin):
                 created = 0
                 updated = 0
                 encoded = 0
+                photos_real = 0
+                photos_missing = 0
 
                 for data in all_students:
                     try:
@@ -183,6 +185,10 @@ class StudentAdmin(admin.ModelAdmin):
                                 filename = f"{data['uid']}.jpg"
                                 student.photo.save(filename, ContentFile(photo_content), save=True)
                                 photo_downloaded = True
+                                if len(photo_content) != TrombiScraper.PLACEHOLDER_PHOTO_SIZE:
+                                    photos_real += 1
+                                else:
+                                    photos_missing += 1
 
                         if encode_faces_option and can_encode and student.photo:
                             if photo_downloaded or not student.face_encoding:
@@ -202,7 +208,9 @@ class StudentAdmin(admin.ModelAdmin):
 
                 messages.success(
                     request,
-                    f"✅ Synchronisation terminée ! {created} créés, {updated} mis à jour, {encoded} visages encodés."
+                    f"✅ Synchronisation terminée ! {created} créés, {updated} mis à jour, "
+                    f"{photos_real} vraies photos téléchargées, {photos_missing} sans photo sur le trombi, "
+                    f"{encoded} visages encodés."
                 )
                 return redirect('..')
         else:

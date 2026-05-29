@@ -9,6 +9,7 @@ class TrombiScraper:
     LOGIN_URL = "https://trombi.imtbs-tsp.eu/etudiants.php?login"
     ETUDIANTS_URL = "https://trombi.imtbs-tsp.eu/etudiants.php"
     PHOTO_URL = "https://trombi.imtbs-tsp.eu/photo.php"
+    PLACEHOLDER_PHOTO_SIZE = 26324
 
     def __init__(self):
         self.session = requests.Session()
