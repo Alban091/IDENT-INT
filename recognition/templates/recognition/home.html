@@ -128,6 +128,8 @@
 
     .feature-item .icon-box {
         margin: 0 auto 1rem;
+        font-size: 2rem;
+        color: var(--primary-green);
     }
 
     #imagePreview img {
@@ -155,10 +157,10 @@
             <div class="accent-line"></div>
             <h1 class="hero-title">
                 Identification <br>
-                <span class="hero-highlight">Faciale Intelligente</span>
+                <span class="hero-highlight">Faciale</span>
             </h1>
             <p class="hero-subtitle">
-                Système de reconnaissance faciale avancé propulsé par l'IA pour Télécom SudParis
+                Reconnaissance faciale des étudiants de Télécom SudParis et IMT-BS à partir du trombinoscope
             </p>
             <div class="mb-4">
                 <a href="https://www.telecom-sudparis.eu" target="_blank" class="stats-badge text-decoration-none">
@@ -218,45 +220,45 @@
     </div>
 </div>
 
-<!-- Features Section -->
+<!-- Comment ça marche -->
 <div class="feature-grid">
     <div class="feature-item">
         <div class="icon-box">
-            <i class="fas fa-brain"></i>
+            <i class="fas fa-upload"></i>
         </div>
-        <h5 class="mb-2">IA Avancée</h5>
+        <h5 class="mb-2">1. Upload</h5>
         <p class="text-muted small mb-0">
-            Deep Learning et réseaux neuronaux pour une précision maximale
+            Déposez une photo. L'application détecte automatiquement le visage présent dessus.
         </p>
     </div>
 
     <div class="feature-item">
         <div class="icon-box">
-            <i class="fas fa-bolt"></i>
+            <i class="fas fa-crop"></i>
         </div>
-        <h5 class="mb-2">Ultra-Rapide</h5>
+        <h5 class="mb-2">2. Détection & recentrage</h5>
         <p class="text-muted small mb-0">
-            Analyse et identification en moins de 2 secondes
+            Le visage est localisé puis recentré pour isoler les traits du reste de l'image.
         </p>
     </div>
 
     <div class="feature-item">
         <div class="icon-box">
-            <i class="fas fa-shield-alt"></i>
+            <i class="fas fa-vector-square"></i>
         </div>
-        <h5 class="mb-2">Sécurisé</h5>
+        <h5 class="mb-2">3. Encodage</h5>
         <p class="text-muted small mb-0">
-            100% conforme RGPD avec cryptage des données
+            Le visage est converti en un vecteur de 128 dimensions résumant ses caractéristiques.
         </p>
     </div>
 
     <div class="feature-item">
         <div class="icon-box">
-            <i class="fas fa-database"></i>
+            <i class="fas fa-list-ol"></i>
         </div>
-        <h5 class="mb-2">Base étendue</h5>
+        <h5 class="mb-2">4. Comparaison</h5>
         <p class="text-muted small mb-0">
-            Plus de 1,247 profils étudiants référencés
+            Ce vecteur est comparé à ceux du trombinoscope, classés du plus ressemblant au moins ressemblant.
         </p>
     </div>
 </div>
