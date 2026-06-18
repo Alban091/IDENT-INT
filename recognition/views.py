@@ -99,7 +99,12 @@ def error_500(request):
 
 def about(request):
     """Page À propos - Présentation du projet"""
-    return render(request, 'recognition/about.html')
+    from .models import Student
+    context = {
+        'total_students': Student.objects.count(),
+        'encoded_students': Student.objects.exclude(face_encoding='').exclude(face_encoding__isnull=True).count(),
+    }
+    return render(request, 'recognition/about.html', context)
 
 def legal(request):
     return render(request, 'recognition/legal.html')
