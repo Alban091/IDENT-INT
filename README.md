@@ -81,7 +81,7 @@ python manage.py sync_trombi --ecole TSP --annee all
 
 Les photos sont téléchargées dans `media/students_photos/` et les visages
 encodés automatiquement. Options : `--ecole {TSP,IMT-BS,all}`,
-`--annee {fi_1,fi_2,fi_3,all}`, `--no-encode`.
+`--annee {fi_1,fi_2,fi_3,bac_1,bac_2,bac_3,all}`, `--no-encode`.
 
 Lancer le serveur :
 
@@ -123,6 +123,19 @@ IDENT-INT/
 ```bash
 python manage.py test recognition
 ```
+
+## Limites connues
+
+- Certains étudiants ne sont pas référencés dans le trombinoscope, ou n'y ont pas
+  de photo : le trombinoscope renvoie alors une image générique, comptabilisée
+  séparément lors de la synchronisation.
+- Les alternants ne forment pas une catégorie distincte dans le trombinoscope :
+  ils sont répartis dans les années `fi_1` à `fi_3`.
+- La synchronisation complète depuis l'interface admin est longue ; la commande
+  en ligne de commande est préférable pour les gros volumes (SQLite ne gère pas
+  les écritures concurrentes).
+- La détection des photos manquantes repose sur la taille du fichier générique
+  renvoyé par le trombinoscope, qui pourrait changer.
 
 ## Éthique et RGPD
 
